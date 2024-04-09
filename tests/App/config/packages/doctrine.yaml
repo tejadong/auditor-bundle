@@ -29,8 +29,8 @@ doctrine:
                 mappings:
                     App:
                         is_bundle: false
-                        type: attribute
-                        dir: '%kernel.project_dir%/../../vendor/damienharper/auditor/tests/Provider/Doctrine/Fixtures/Entity/Standard/Blog'
+                        type: annotation
+                        dir: '%kernel.project_dir%/../../vendor/tejadong/auditor/tests/Provider/Doctrine/Fixtures/Entity/Standard/Blog'
                         prefix: 'DH\Auditor\Tests\Provider\Doctrine\Fixtures\Entity\Standard\Blog'
                         alias: App
             audits:

@@ -9,48 +9,51 @@ use DH\Auditor\Configuration as AuditorConfiguration;
 use DH\Auditor\Provider\Doctrine\Configuration as DoctrineProviderConfiguration;
 use DH\Auditor\Provider\Doctrine\DoctrineProvider;
 use DH\Auditor\Provider\Doctrine\Persistence\Event\CreateSchemaListener;
-use DH\Auditor\Provider\Doctrine\Persistence\Event\TableSchemaListener;
 use DH\Auditor\Provider\Doctrine\Persistence\Reader\Reader;
 use DH\AuditorBundle\Controller\ViewerController;
 use DH\AuditorBundle\DHAuditorBundle;
 use DH\AuditorBundle\Event\ConsoleEventSubscriber;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Nyholm\BundleTest\TestKernel;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Nyholm\BundleTest\BaseBundleTestCase;
+use Nyholm\BundleTest\CompilerPass\PublicServicePass;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @internal
  *
  * @small
  */
-final class DHAuditorBundleTest extends KernelTestCase
+final class DHAuditorBundleTest extends BaseBundleTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Make services public
+        $this->addCompilerPass(new PublicServicePass('#^(DH\\\\Auditor(Bundle)?\\\\|dh_auditor\.).*$#'));
+    }
+
     public function testInitBundle(): void
     {
-        // Boot the kernel with a config closure, the handleOptions call in createKernel is important for that to work
-        $kernel = self::bootKernel(['config' => static function (TestKernel $kernel) {
-            // Add some other bundles we depend on
-            $kernel->addTestBundle(DoctrineBundle::class);
-            $kernel->addTestBundle(SecurityBundle::class);
-            $kernel->addTestBundle(TwigBundle::class);
+        $kernel = $this->createKernel();
 
-            // Add some configuration
-            $kernel->addTestConfig(__DIR__.'/Fixtures/Resources/config/dh_auditor.yaml');
-            $kernel->addTestConfig(__DIR__.'/Fixtures/Resources/config/doctrine.yaml');
-            if (Kernel::MAJOR_VERSION < 6) {
-                $kernel->addTestConfig(__DIR__.'/App/config/services_legacy.yaml');
-                $kernel->addTestConfig(__DIR__.'/Fixtures/Resources/config/sf4_5/security.yaml');
-            } else {
-                $kernel->addTestConfig(__DIR__.'/Fixtures/Resources/config/sf6_7/security.yaml');
-            }
-        }]);
+        $kernel->addConfigFile(__DIR__.'/Fixtures/Resources/config/dh_auditor.yaml');
+        $kernel->addConfigFile(__DIR__.'/Fixtures/Resources/config/doctrine.yaml');
+        if (6 === Kernel::MAJOR_VERSION) {
+            $kernel->addConfigFile(__DIR__.'/Fixtures/Resources/config/sf6/security.yaml');
+        } else {
+            $kernel->addConfigFile(__DIR__.'/Fixtures/Resources/config/sf4_5/security.yaml');
+        }
 
-        // Get the container
-        $container = self::getContainer();
+        $kernel->addBundle(DoctrineBundle::class);
+        $kernel->addBundle(SecurityBundle::class);
+        $kernel->addBundle(TwigBundle::class);
+
+        $this->bootKernel();
+
+        $container = $this->getContainer();
 
         self::assertTrue($container->has(AuditorConfiguration::class));
         self::assertInstanceOf(AuditorConfiguration::class, $container->get(AuditorConfiguration::class));
@@ -70,9 +73,6 @@ final class DHAuditorBundleTest extends KernelTestCase
         self::assertTrue($container->has(Reader::class));
         self::assertInstanceOf(Reader::class, $container->get(Reader::class));
 
-        self::assertTrue($container->has(TableSchemaListener::class));
-        self::assertInstanceOf(TableSchemaListener::class, $container->get(TableSchemaListener::class));
-
         self::assertTrue($container->has(CreateSchemaListener::class));
         self::assertInstanceOf(CreateSchemaListener::class, $container->get(CreateSchemaListener::class));
 
@@ -83,25 +83,8 @@ final class DHAuditorBundleTest extends KernelTestCase
         self::assertInstanceOf(ConsoleEventSubscriber::class, $container->get(ConsoleEventSubscriber::class));
     }
 
-    protected function getBundleClass(): string
+    protected function getBundleClass()
     {
         return DHAuditorBundle::class;
-    }
-
-    protected static function getKernelClass(): string
-    {
-        return TestKernel::class;
-    }
-
-    protected static function createKernel(array $options = []): KernelInterface
-    {
-        /**
-         * @var TestKernel $kernel
-         */
-        $kernel = parent::createKernel($options);
-        $kernel->addTestBundle(DHAuditorBundle::class);
-        $kernel->handleOptions($options);
-
-        return $kernel;
     }
 }

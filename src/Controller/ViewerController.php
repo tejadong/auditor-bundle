@@ -20,17 +20,21 @@ use Twig\Environment;
 
 /**
  * @see ViewerControllerTest
+ *
+ * @final since 5.2.5
  */
-final class ViewerController
+class ViewerController
 {
-    private Environment $environment;
+    private $environment;
 
     public function __construct(Environment $environment)
     {
         $this->environment = $environment;
     }
 
-    #[Route(path: '/audit', name: 'dh_auditor_list_audits', methods: ['GET'])]
+    /**
+     * @Route(path="/audit", name="dh_auditor_list_audits", methods={"GET"})
+     */
     public function listAuditsAction(Reader $reader): Response
     {
         $schemaManager = new SchemaManager($reader->getProvider());
@@ -39,7 +43,7 @@ final class ViewerController
         $auditingServices = $reader->getProvider()->getAuditingServices();
         $audited = [];
         $scope = Security::VIEW_SCOPE;
-        foreach ($auditingServices as $auditingService) {
+        foreach ($auditingServices as $name => $auditingService) {
             $audited = array_merge(
                 $audited,
                 array_filter(
@@ -60,7 +64,9 @@ final class ViewerController
         ]);
     }
 
-    #[Route(path: '/audit/transaction/{hash}', name: 'dh_auditor_show_transaction', methods: ['GET'])]
+    /**
+     * @Route(path="/audit/transaction/{hash}", name="dh_auditor_show_transaction", methods={"GET"})
+     */
     public function showTransactionAction(Reader $reader, string $hash): Response
     {
         $audits = $reader->getAuditsByTransactionHash($hash);
@@ -71,8 +77,12 @@ final class ViewerController
         ]);
     }
 
-    #[Route(path: '/audit/{entity}/{id}', name: 'dh_auditor_show_entity_history', methods: ['GET'])]
-    public function showEntityHistoryAction(Request $request, Reader $reader, string $entity, null|int|string $id = null): Response
+    /**
+     * @Route(path="/audit/{entity}/{id}", name="dh_auditor_show_entity_history", methods={"GET"})
+     *
+     * @param int|string $id
+     */
+    public function showEntityHistoryAction(Request $request, Reader $reader, string $entity, $id = null): Response
     {
         \assert(\is_string($request->query->get('page', '1')) || \is_int($request->query->get('page', '1')));
         $page = (int) $request->query->get('page', '1');
@@ -100,7 +110,7 @@ final class ViewerController
         ]);
     }
 
-    private function renderView(string $view, array $parameters = []): Response
+    protected function renderView(string $view, array $parameters = []): Response
     {
         return new Response($this->environment->render($view, $parameters));
     }
