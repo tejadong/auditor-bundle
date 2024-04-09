@@ -1,5 +1,5 @@
 {
-    "name": "damienharper/auditor-bundle",
+    "name": "tejadong/auditor-bundle",
     "type": "symfony-bundle",
     "description": "Integrate auditor library in your Symfony projects.",
     "keywords": ["doctrine", "audit", "auditor", "audit-log", "audit-trail"],
@@ -13,7 +13,7 @@
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
-        "damienharper/auditor": "^2.3",
+        "tejadong/auditor": "^2.3",
         "doctrine/annotations": "^1.8|^2.0",
         "doctrine/doctrine-bundle": "^2.7",
         "doctrine/orm": "^2.7",
@@ -35,7 +35,7 @@
     "autoload-dev": {
         "psr-4": {
             "DH\\AuditorBundle\\Tests\\": "tests",
-            "DH\\Auditor\\Tests\\": "vendor/damienharper/auditor/tests"
+            "DH\\Auditor\\Tests\\": "vendor/tejadong/auditor/tests"
         }
     },
     "require-dev": {

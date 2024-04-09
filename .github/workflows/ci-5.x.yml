@@ -96,7 +96,7 @@ jobs:
         run: SYMFONY_REQUIRE="^5.4" composer update --no-progress --ansi --prefer-stable
 
       - name: Install auditor from source
-        run: composer reinstall damienharper/auditor --prefer-install=source
+        run: composer reinstall tejadong/auditor --prefer-install=source
 
       - name: Install PHPStan
         run: composer install --no-progress --ansi --working-dir=tools/phpstan
@@ -167,7 +167,7 @@ jobs:
         run: SYMFONY_REQUIRE="^6.0" composer update --no-progress --ansi --prefer-stable
 
       - name: Install auditor from source
-        run: composer reinstall damienharper/auditor --prefer-install=source
+        run: composer reinstall tejadong/auditor --prefer-install=source
 
       - name: Install PHPStan
         run: composer install --no-progress --ansi --working-dir=tools/phpstan

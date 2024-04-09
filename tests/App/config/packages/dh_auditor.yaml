@@ -1,5 +1,5 @@
 # Configuration reference available at:
-# https://github.com/DamienHarper/DoctrineAuditBundle#configuration
+# https://github.com/tejadong/DoctrineAuditBundle#configuration
 dh_auditor:
     enabled: true
     timezone: 'UTC'
