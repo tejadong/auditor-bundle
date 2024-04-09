@@ -1,0 +1,8 @@
+{
+    "bundles": {
+        "DH\\AuditorBundle\\DHAuditorBundle": ["all"]
+    },
+    "copy-from-package": {
+        "recipes/": "%CONFIG_DIR%/"
+    }
+}
